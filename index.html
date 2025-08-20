@@ -75,6 +75,17 @@
             color: white;
             font-size: 1.5rem;
             cursor: pointer;
+            padding: 0.5rem;
+            z-index: 1001;
+            position: relative;
+        }
+
+        .mobile-menu-btn:focus {
+            outline: 2px solid #ffd700;
+        }
+
+        .mobile-menu-btn:active {
+            transform: scale(0.95);
         }
 
         /* Hero Section */
@@ -103,6 +114,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         .hero .subtitle {
@@ -460,6 +473,18 @@
         }
 
         /* Responsive Design */
+        @media (max-width: 1200px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+        }
+
         @media (max-width: 768px) {
             .mobile-menu-btn {
                 display: block;
@@ -467,24 +492,44 @@
 
             .nav-links {
                 position: fixed;
-                top: 100%;
+                top: 70px;
                 left: 0;
                 width: 100%;
-                background: rgba(102, 126, 234, 0.95);
-                backdrop-filter: blur(10px);
+                background: rgba(102, 126, 234, 0.98);
+                backdrop-filter: blur(15px);
                 flex-direction: column;
-                gap: 1rem;
-                padding: 2rem;
-                transform: translateY(-100%);
-                opacity: 0;
-                visibility: hidden;
-                transition: all 0.3s ease;
+                gap: 0;
+                padding: 0;
+                margin: 0;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 999;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             }
 
             .nav-links.active {
-                transform: translateY(0);
-                opacity: 1;
-                visibility: visible;
+                transform: translateX(0);
+            }
+
+            .nav-links li {
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+
+            .nav-links li:last-child {
+                border-bottom: none;
+            }
+
+            .nav-links a {
+                display: block;
+                padding: 1.2rem 2rem;
+                color: white;
+                text-decoration: none;
+                transition: background-color 0.3s ease;
+            }
+
+            .nav-links a:hover {
+                background-color: rgba(255,255,255,0.1);
+                color: #ffd700;
             }
 
             .hero {
@@ -495,6 +540,9 @@
             .hero h1 {
                 font-size: 2.5rem;
                 min-height: 3rem;
+                white-space: normal;
+                text-align: center;
+                line-height: 1.2;
             }
 
             .hero .subtitle {
@@ -798,16 +846,43 @@
     </footer>
 
     <script>
-        // Mobile menu functionality
+        // Mobile menu functionality - Improved for touch devices
         function toggleMobileMenu() {
             const navLinks = document.getElementById('nav-links');
-            navLinks.classList.toggle('active');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            const isActive = navLinks.classList.contains('active');
+            
+            if (isActive) {
+                navLinks.classList.remove('active');
+                menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            } else {
+                navLinks.classList.add('active');
+                menuBtn.innerHTML = '<i class="fas fa-times"></i>';
+            }
         }
 
         function closeMobileMenu() {
             const navLinks = document.getElementById('nav-links');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
             navLinks.classList.remove('active');
+            menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
         }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navLinks = document.getElementById('nav-links');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            const nav = document.querySelector('.nav');
+            
+            if (!nav.contains(event.target) && navLinks.classList.contains('active')) {
+                closeMobileMenu();
+            }
+        });
+
+        // Prevent menu from closing when clicking inside the nav
+        document.querySelector('.nav').addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
 
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -847,16 +922,33 @@
             observer.observe(el);
         });
 
-        // Improved typing effect for hero title
+        // Improved typing effect for hero title with repeat
         const heroTitle = document.getElementById('typing-name');
         const titleText = 'Aashish Venkatesh Gautham';
-        
         let i = 0;
+        let isDeleting = false;
+        
         const typeWriter = () => {
-            if (i < titleText.length) {
+            if (!isDeleting && i < titleText.length) {
+                // Typing forward
                 heroTitle.textContent += titleText.charAt(i);
                 i++;
-                setTimeout(typeWriter, 80);
+                setTimeout(typeWriter, 50); // Faster typing speed
+            } else if (!isDeleting && i === titleText.length) {
+                // Pause at end before deleting
+                setTimeout(() => {
+                    isDeleting = true;
+                    typeWriter();
+                }, 2000); // Pause for 2 seconds
+            } else if (isDeleting && i > 0) {
+                // Deleting backward
+                heroTitle.textContent = titleText.substring(0, i - 1);
+                i--;
+                setTimeout(typeWriter, 30); // Faster deleting speed
+            } else if (isDeleting && i === 0) {
+                // Start over
+                isDeleting = false;
+                setTimeout(typeWriter, 500); // Short pause before retyping
             }
         };
         
