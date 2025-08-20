@@ -586,6 +586,21 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        .hero h1 {
+        white-space: normal;   /* allow wrapping */
+        overflow: visible;     /* prevent hidden letters */
+        text-align: center;    /* center text */
+        display: inline-block; /* inline so it centers cleanly */
+}
+
+/* Fix email overflow in contact box */
+    .contact-item a {
+        overflow-wrap: anywhere;  /* break long strings */
+        display: inline-block;
+        max-width: 100%;          /* stay inside box */
+}
+/* === FIXES END === */
     </style>
 </head>
 <body>
